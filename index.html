@@ -1,0 +1,42 @@
+﻿<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>DEPTH-PROBE // VECTOR EDITION</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div id="hud">
+      <span>DEPTH: <span id="h-depth">0</span>m</span>
+      <span>BATTERY: <span id="h-battery">100.0</span>%</span>
+      <span>HULL: <span id="h-hull">100</span>%</span>
+      <span>NODES: <span id="h-vents">0</span></span>
+      <span>SPD: <span id="h-speed">0.00</span> m/s</span>
+    </div>
+    <canvas id="canvas" width="640" height="480"></canvas>
+    <div id="footer">
+      <span>[A/D] or [←/→] ROTATE</span>
+      <span>[W] or [↑] THRUST</span>
+      <span>[SPACE] BRAKE</span>
+    </div>
+
+    <div id="overlay">
+      <h1>DEPTH-PROBE</h1>
+      <div class="sub">
+        VECTOR EDITION v1.0<br />
+        ─────────────────────────────<br />
+        DESCEND INTO THE HADAL TRENCH<br />
+        LOCATE BIO-NODES TO RECHARGE<br />
+        AVOID THE CANYON WALLS<br />
+        ─────────────────────────────<br />
+        BUOYANCY WILL DRAG YOU UPWARD.<br />
+        BATTERY DEPLETES OVER TIME.<br />
+        WALLS DAMAGE HULL — SPEED MATTERS.<br />
+      </div>
+      <div class="big">[ PRESS ANY KEY OR CLICK TO DIVE ]</div>
+    </div>
+
+    <script src="game.js"></script>
+  </body>
+</html>

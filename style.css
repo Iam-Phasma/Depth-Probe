@@ -1,0 +1,122 @@
+@import url("https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap");
+
+:root {
+  --c-primary: #38bdf8;
+  --c-dim: #1e6a8a;
+  --c-bright: #7dd3fc;
+  --c-border: #0e2d45;
+  --c-bg: #010c15;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background: #000;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  overflow: hidden;
+  font-family: "Share Tech Mono", "Courier New", monospace;
+  color: var(--c-primary);
+}
+
+/* ── HUD bar ────────────────────────────────────────────────────── */
+#hud {
+  width: 640px;
+  display: flex;
+  justify-content: space-between;
+  padding: 4px 8px;
+  font-size: 13px;
+  letter-spacing: 0.08em;
+  color: var(--c-primary);
+  border: 1px solid var(--c-border);
+  background: var(--c-bg);
+  margin-bottom: 2px;
+  user-select: none;
+}
+
+/* ── Canvas ─────────────────────────────────────────────────────── */
+#canvas {
+  display: block;
+  border: 1px solid var(--c-border);
+  box-shadow: 0 0 12px #38bdf818;
+  image-rendering: pixelated;
+  cursor: none;
+}
+
+/* ── Footer controls bar ────────────────────────────────────────── */
+#footer {
+  width: 640px;
+  display: flex;
+  justify-content: space-between;
+  padding: 4px 8px;
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  color: var(--c-dim);
+  border: 1px solid var(--c-border);
+  background: var(--c-bg);
+  margin-top: 2px;
+  user-select: none;
+}
+
+/* ── Title / death overlay ──────────────────────────────────────── */
+#overlay {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  width: 640px;
+  height: 480px;
+  background: rgba(1, 10, 20, 0.94);
+  color: var(--c-primary);
+  font-family: "Share Tech Mono", "Courier New", monospace;
+  pointer-events: none;
+}
+
+#overlay h1 {
+  font-size: 28px;
+  letter-spacing: 0.2em;
+  border-bottom: 1px solid #38bdf830;
+  padding-bottom: 10px;
+  text-align: center;
+}
+
+#overlay .sub {
+  font-size: 12px;
+  color: var(--c-dim);
+  letter-spacing: 0.12em;
+  text-align: center;
+  line-height: 1.9;
+}
+
+#overlay .big {
+  font-size: 16px;
+  letter-spacing: 0.15em;
+  animation: blink 1.1s step-end infinite;
+}
+
+#overlay .score-line {
+  font-size: 14px;
+  color: var(--c-bright);
+  letter-spacing: 0.1em;
+}
+
+@keyframes blink {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
+}

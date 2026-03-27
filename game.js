@@ -528,15 +528,19 @@ const inputBrake = () => keys["Space"];
 function spawnThrusterParticles() {
   const back = probe.angle + Math.PI;
   for (let i = 0; i < 3; i++) {
-    const spread = (Math.random() - 0.5) * 0.5;
-    const speed = 1.2 + Math.random() * 1.4;
+    const spread = (Math.random() - 0.5) * 0.6;
+    // Exhaust speed must exceed probe speed so bubbles always trail behind
+    const exhaustSpd = Math.hypot(probe.vx, probe.vy) + 1.8 + Math.random() * 1.4;
+    const dir = back + spread;
     particles.push({
-      x: probe.x + Math.cos(back + spread) * PROBE_SIZE,
-      y: probe.y + Math.sin(back + spread) * PROBE_SIZE,
-      vx: Math.cos(back + spread) * speed + probe.vx * 0.3,
-      vy: Math.sin(back + spread) * speed + probe.vy * 0.3,
-      life: 1.0,
-      decay: 0.04 + Math.random() * 0.04,
+      x:     probe.x + Math.cos(back) * (PROBE_SIZE + 2),
+      y:     probe.y + Math.sin(back) * (PROBE_SIZE + 2),
+      vx:    Math.cos(dir) * exhaustSpd,
+      vy:    Math.sin(dir) * exhaustSpd,
+      life:  1.0,
+      decay: 0.055 + Math.random() * 0.04,
+      angle: dir,
+      thruster: true,
     });
   }
 }
@@ -545,34 +549,39 @@ function spawnVentParticles(vent) {
   const svy = vent.wy - worldY + H * 0.5;
   for (let i = 0; i < 28; i++) {
     const a = Math.random() * Math.PI * 2;
-    const s = 0.5 + Math.random() * 2.5;
+    const s = 0.4 + Math.random() * 1.8;
     const cyan = Math.random() > 0.45;
+    const r = 1.5 + Math.random() * 2.5; // bubble radius
     particles.push({
-      x: vent.x + (Math.random() - 0.5) * VENT_RADIUS,
-      y: svy + (Math.random() - 0.5) * VENT_RADIUS,
-      vx: Math.cos(a) * s,
-      vy: Math.sin(a) * s,
-      life: 1.0,
-      decay: 0.018 + Math.random() * 0.022,
-      vent: true,
+      x:    vent.x + (Math.random() - 0.5) * VENT_RADIUS,
+      y:    svy    + (Math.random() - 0.5) * VENT_RADIUS,
+      vx:   Math.cos(a) * s,
+      vy:   Math.sin(a) * s - 0.4, // slight upward bias
+      life:  1.0,
+      decay: 0.014 + Math.random() * 0.018,
+      vent:  true,
       cyan,
+      r,
     });
   }
 }
 
 // ─── Collision ────────────────────────────────────────────────────────────────
 function spawnImpactParticles(cx, cy) {
-  for (let i = 0; i < 14; i++) {
+  for (let i = 0; i < 18; i++) {
     const a = Math.random() * Math.PI * 2;
-    const s = 0.8 + Math.random() * 2.2;
+    const s = 0.5 + Math.random() * 2.5;
     particles.push({
-      x: cx + (Math.random() - 0.5) * 6,
-      y: cy + (Math.random() - 0.5) * 6,
-      vx: Math.cos(a) * s,
-      vy: Math.sin(a) * s,
-      life: 1.0,
-      decay: 0.04 + Math.random() * 0.05,
+      x:     cx + (Math.random() - 0.5) * 8,
+      y:     cy + (Math.random() - 0.5) * 8,
+      vx:    Math.cos(a) * s,
+      vy:    Math.sin(a) * s,
+      life:  1.0,
+      decay: 0.025 + Math.random() * 0.03,
       impact: true,
+      w:     1.5 + Math.random() * 3,   // sediment fleck width
+      h:     0.8 + Math.random() * 1.5, // sediment fleck height
+      rot:   Math.random() * Math.PI,
     });
   }
 }
@@ -901,19 +910,56 @@ function drawVents() {
 function drawParticles() {
   ctx.save();
   for (const p of particles) {
-    ctx.globalAlpha = Math.max(0, p.life);
-    if (p.vent) {
+    const alpha = Math.max(0, p.life);
+    ctx.globalAlpha = alpha;
+
+    if (p.thruster) {
+      // Elongated exhaust bubble: small ellipse stretched along exhaust direction
+      const blen = 3 + (1 - p.life) * 2;
+      ctx.save();
+      ctx.translate(p.x, p.y);
+      ctx.rotate(p.angle);
+      ctx.beginPath();
+      ctx.ellipse(0, 0, blen, 1.1, 0, 0, Math.PI * 2);
+      // Bubble: translucent white centre, blue-tinted rim
+      ctx.fillStyle = `rgba(180,230,255,${0.25 * alpha})`;
+      ctx.fill();
+      ctx.strokeStyle = `rgba(100,200,255,${0.55 * alpha})`;
+      ctx.lineWidth = 0.6;
+      ctx.stroke();
+      ctx.restore();
+
+    } else if (p.vent) {
+      // Rising micro-bubble: small circle with highlight dot
+      ctx.beginPath();
       const h = p.cyan ? 190 + p.life * 20 : 270 + p.life * 30;
-      ctx.fillStyle = `hsl(${h}, 100%, ${70 + p.life * 20}%)`;
+      ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+      ctx.strokeStyle = `hsla(${h}, 100%, 80%, ${0.7 * alpha})`;
+      ctx.lineWidth = 0.8;
+      ctx.stroke();
+      // Tiny specular dot
+      ctx.beginPath();
+      ctx.arc(p.x - p.r * 0.3, p.y - p.r * 0.3, p.r * 0.25, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(255,255,255,${0.5 * alpha})`;
+      ctx.fill();
+
     } else if (p.impact) {
-      const bright = 55 + p.life * 30;
-      ctx.fillStyle = `hsl(${20 + p.life * 10}, 100%, ${bright}%)`;
+      // Suspended sediment fleck: small rotated rectangle, muted tan/grey
+      ctx.save();
+      ctx.translate(p.x, p.y);
+      ctx.rotate(p.rot + p.life * 2); // slow tumble
+      const lightness = 40 + p.life * 20;
+      ctx.fillStyle = `hsla(40, 30%, ${lightness}%, ${0.7 * alpha})`;
+      ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
+      ctx.restore();
+
     } else {
-      ctx.fillStyle = `hsl(${200 + p.life * 15}, 90%, ${55 + p.life * 20}%)`;
+      // Fallback: plain dot
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, 2, 0, Math.PI * 2);
+      ctx.fillStyle = `hsl(200, 80%, 60%)`;
+      ctx.fill();
     }
-    ctx.beginPath();
-    ctx.arc(p.x, p.y, p.vent ? 3 : 2, 0, Math.PI * 2);
-    ctx.fill();
   }
   ctx.globalAlpha = 1;
   ctx.restore();

@@ -4,7 +4,7 @@ A minimalist browser game. You pilot a deep-sea drone down a procedurally genera
 
 ## Play
 
-Open `index.html` directly in any modern browser, or host via [GitHub Pages](https://pages.github.com/) — no build step, no dependencies.
+Open: https://iam-phasma.github.io/Depth-Probe/
 
 ## Controls
 
